@@ -5,35 +5,213 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School RFID Attendance V3.7</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; background-color: #f0f2f5; }
-        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        h1, h2 { color: #2c3e50; text-align: center; margin-bottom: 1.5rem; }
-        
-        input[type="text"], select, input[type="file"] { width: 100%; padding: 12px; margin: 5px 0; border: 2px solid #e1e4e8; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-        input[type="text"]:focus, select:focus { border-color: #4CAF50; outline: none; }
-        
-        button { width: 100%; padding: 14px; background-color: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; transition: background 0.2s; }
-        button:hover { background-color: #45a049; }
-        .btn-delete { background-color: #e53e3e; padding: 8px 12px; font-size: 12px; width: auto; }
-        .btn-delete:hover { background-color: #c53030; }
-        
-        #status { margin-top: 1rem; padding: 15px; border-radius: 6px; text-align: center; display: none; font-weight: bold; }
-        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+:root {
+    --primary: #4CAF50;
+    --primary-dark: #3a9e43;
+    --danger: #e53e3e;
+    --bg: #f4f6f9;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+}
 
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.95rem; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
-        th { background-color: #4CAF50; color: white; }
-        
-        .profile-pic { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #ddd; }
-        .no-pic { width: 45px; height: 45px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #999; }
+* {
+    box-sizing: border-box;
+}
 
-        .admin-box { border: 2px dashed #cbd5e0; background-color: #f8fafc; }
-        .admin-title { color: #64748b; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; margin-bottom: 15px; }
-        
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
-    </style>
+body {
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #eef2f7, #f8fafc);
+    max-width: 1000px;
+    margin: auto;
+    padding: 1.5rem;
+    color: var(--text);
+}
+
+.container {
+    background: var(--card);
+    padding: 1.8rem;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+    margin-bottom: 24px;
+}
+
+h1 {
+    font-size: 1.9rem;
+    margin-bottom: 1rem;
+}
+
+h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+}
+
+h3 {
+    margin-top: 2rem;
+}
+
+select,
+input[type="text"],
+input[type="file"] {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.8px solid #e5e7eb;
+    font-size: 15px;
+    transition: all 0.2s ease;
+}
+
+select:focus,
+input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(76,175,80,.15);
+}
+
+/* RFID Input Highlight */
+#attendanceInput {
+    font-size: 1.15rem;
+    font-weight: bold;
+    text-align: center;
+    border: 2px dashed var(--primary);
+    background: #f0fdf4;
+    letter-spacing: 1px;
+}
+
+/* Buttons */
+button {
+    padding: 13px;
+    border-radius: 10px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+button:not(.btn-delete) {
+    background: var(--primary);
+    color: white;
+}
+
+button:not(.btn-delete):hover {
+    background: var(--primary-dark);
+}
+
+.btn-delete {
+    background: var(--danger);
+    color: white;
+    padding: 7px 12px;
+    font-size: 12px;
+}
+
+.btn-delete:hover {
+    background: #c53030;
+}
+
+/* Status */
+#status {
+    margin-top: 15px;
+    padding: 14px;
+    border-radius: 10px;
+    font-weight: bold;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 18px;
+    font-size: 0.93rem;
+}
+
+th {
+    background: var(--primary);
+    color: white;
+    padding: 12px;
+    position: sticky;
+    top: 0;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+    background: #f9fafb;
+}
+
+/* Images */
+.profile-pic,
+.no-pic {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+}
+
+.profile-pic {
+    object-fit: cover;
+    border: 2px solid #e5e7eb;
+}
+
+.no-pic {
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    font-weight: bold;
+}
+
+/* Admin Panel */
+.admin-box {
+    border: 2px dashed #cbd5e1;
+    background: linear-gradient(135deg, #f8fafc, #ffffff);
+}
+
+.admin-title {
+    text-align: center;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: #64748b;
+    margin-bottom: 12px;
+}
+
+/* Form Grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+@media (max-width: 700px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
 </head>
 <body>
 
@@ -248,3 +426,4 @@ const firebaseConfig = {
 </script>
 </body>
 </html>
+
