@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School RFID Attendance V3.6</title>
+    <title>School RFID Attendance V3.7</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; background-color: #f0f2f5; }
         .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
@@ -39,6 +39,16 @@
 
 <div class="container">
     <h1>🏫 Daily Attendance Check-in</h1>
+    
+    <select id="activeSubject" style="border: 2px solid #4CAF50; font-weight: bold;">
+        <option value="General">General Attendance</option>
+        <option value="Mathematics">Mathematics</option>
+        <option value="Science">Science</option>
+        <option value="English">English</option>
+        <option value="History">History</option>
+        <option value="Physical Education">P.E.</option>
+    </select>
+
     <input type="text" id="attendanceInput" placeholder="Scan RFID tag here..." autofocus autocomplete="off">
     <div id="status"></div>
 
@@ -49,8 +59,7 @@
                 <th>Photo</th>
                 <th>Time</th>
                 <th>Name</th>
-                <th>Grade</th>
-                <th>Gender</th>
+                <th>Subject</th> <th>Grade</th>
                 <th>ID</th>
             </tr>
         </thead>
@@ -81,6 +90,9 @@
             <option value="Other">Other</option>
         </select>
     </div>
+    
+    <input type="text" id="regSubject" placeholder="Major Subject / Department (e.g. Science)">
+    
     <input type="file" id="regPhoto" accept="image/*">
     <input type="text" id="regTag" placeholder="Scan Card to Register ID...">
     <button onclick="registerStudent()">Save Student Profile</button>
@@ -94,7 +106,7 @@
                 <th>Photo</th>
                 <th>Name</th>
                 <th>Grade</th>
-                <th>Tag ID</th>
+                <th>Major</th> <th>Tag ID</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -138,12 +150,13 @@
       snapshot.forEach((doc) => {
           const d = doc.data();
           const id = doc.id;
-          studentDirectory[id] = { name: d.name, grade: d.grade, gender: d.gender, photo: d.photo };
+          studentDirectory[id] = { name: d.name, grade: d.grade, gender: d.gender, photo: d.photo, subject: d.subject };
 
           const row = `<tr>
               <td>${d.photo ? `<img src="${d.photo}" class="profile-pic">` : `<div class="no-pic">?</div>`}</td>
               <td>${d.name}</td>
               <td>${d.grade}</td>
+              <td>${d.subject || '--'}</td>
               <td>${id}</td>
               <td><button class="btn-delete" onclick="deleteStudent('${id}')">Delete</button></td>
           </tr>`;
@@ -155,18 +168,26 @@
       const name = document.getElementById('regName').value.trim();
       const grade = document.getElementById('regGrade').value;
       const gender = document.getElementById('regGender').value;
+      const subject = document.getElementById('regSubject').value.trim(); // Get subject
       const tagId = document.getElementById('regTag').value.trim();
       const photoFile = document.getElementById('regPhoto').files[0];
 
-      if (!name || !tagId || !grade || !gender) return alert("Fill all fields!");
+      if (!name || !tagId || !grade) return alert("Fill Name, Grade, and Tag ID!");
 
       let photoBase64 = null;
       if (photoFile) photoBase64 = await toBase64(photoFile);
 
       try {
-          await setDoc(doc(db, "students", tagId), { name, grade, gender, photo: photoBase64, registeredAt: serverTimestamp() });
+          await setDoc(doc(db, "students", tagId), { 
+              name, 
+              grade, 
+              gender, 
+              subject: subject || "N/A", // Save subject
+              photo: photoBase64, 
+              registeredAt: serverTimestamp() 
+          });
           alert("Student Saved!");
-          ['regName','regTag','regPhoto'].forEach(id => document.getElementById(id).value = '');
+          ['regName','regTag','regPhoto','regSubject'].forEach(id => document.getElementById(id).value = '');
           ['regGrade','regGender'].forEach(id => document.getElementById(id).value = '');
       } catch (e) { alert("Error!"); }
   }
@@ -184,17 +205,19 @@
   attendanceInput.addEventListener('keypress', async (e) => {
       if (e.key === 'Enter' && attendanceInput.value.trim()) {
           const id = attendanceInput.value.trim();
+          const activeSub = document.getElementById('activeSubject').value; // Get current class subject
           const student = studentDirectory[id];
+          
           try {
               await addDoc(collection(db, "attendance"), {
                   tag_id: id,
                   student_name: student ? student.name : "Unknown",
                   student_grade: student ? student.grade : "--",
-                  student_gender: student ? student.gender : "--",
                   student_photo: student ? student.photo : null,
+                  subject: activeSub, // Log the subject of the session
                   timestamp: serverTimestamp()
               });
-              showStatus(student ? `✅ Welcome, ${student.name}!` : `⚠️ Unknown Tag`, student ? "success" : "error");
+              showStatus(student ? `✅ ${student.name} checked into ${activeSub}!` : `⚠️ Unknown Tag`, student ? "success" : "error");
           } catch (e) { showStatus("❌ Error", "error"); }
           attendanceInput.value = '';
       }
@@ -216,8 +239,8 @@
               <td>${d.student_photo ? `<img src="${d.student_photo}" class="profile-pic">` : `<div class="no-pic">?</div>`}</td>
               <td>${time}</td>
               <td>${d.student_name}</td>
+              <td><strong>${d.subject || 'General'}</strong></td>
               <td>${d.student_grade}</td>
-              <td>${d.student_gender}</td>
               <td>${d.tag_id}</td>
           </tr>`;
       });
