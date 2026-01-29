@@ -73,7 +73,7 @@
     
     <div class="form-grid">
         <input type="text" id="regName" placeholder="Full Name (e.g. Somchai)">
-        <select id="regGrade">
+            <select id="regGrade">
             <option value="" disabled selected>Select Grade</option>
             <option value="Grade 1">Grade 1</option>
             <option value="Grade 2">Grade 2</option>
@@ -81,6 +81,14 @@
             <option value="Grade 4">Grade 4</option>
             <option value="Grade 5">Grade 5</option>
             <option value="Grade 6">Grade 6</option>
+            <option value="Grade 7">Grade 7</option>
+            <option value="Grade 8">Grade 8</option>
+            <option value="Grade 9">Grade 9</option>
+            <option value="Grade 10">Grade 10</option>
+            <option value="Grade 11">Grade 11</option>
+            <option value="Grade 12">Grade 12</option>
+            <option value="Teacher">Teacher</option>
+</select>
             <option value="Teacher">Teacher</option>
         </select>
     </div>
@@ -261,4 +269,5 @@ Note: This option uses the modular JavaScript SDK, which provides reduced SDK si
           const data = doc.data();
           let dateStr = "Just now";
           if (data.timestamp) dateStr = data.timestamp.toDate().toLocaleT
+
 
