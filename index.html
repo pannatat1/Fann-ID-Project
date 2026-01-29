@@ -3,35 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School RFID Attendance V3.7</title>
+    <title>School RFID Attendance V3</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; background-color: #f0f2f5; }
         .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
         h1, h2 { color: #2c3e50; text-align: center; margin-bottom: 1.5rem; }
-        
+
+        .form-group { margin-bottom: 10px; }
         input[type="text"], select, input[type="file"] { width: 100%; padding: 12px; margin: 5px 0; border: 2px solid #e1e4e8; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
         input[type="text"]:focus, select:focus { border-color: #4CAF50; outline: none; }
-        
-        button { width: 100%; padding: 14px; background-color: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; transition: background 0.2s; }
-        button:hover { background-color: #45a049; }
-        .btn-delete { background-color: #e53e3e; padding: 8px 12px; font-size: 12px; width: auto; }
-        .btn-delete:hover { background-color: #c53030; }
-        
-        #status { margin-top: 1rem; padding: 15px; border-radius: 6px; text-align: center; display: none; font-weight: bold; }
-        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.95rem; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        button { width: 100%; padding: 14px; background-color: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:hover { background-color: #45a049; }
+
+        #status { margin-top: 1rem; padding: 15px; border-radius: 6px; text-align: center; display: none; font-weight: bold; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 15px; border-bottom: 1px solid #eee; }
         th { background-color: #4CAF50; color: white; }
-        
-        .profile-pic { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #ddd; }
-        .no-pic { width: 45px; height: 45px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #999; }
+
+        .profile-pic { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #ddd; }
+        .no-pic { width: 50px; height: 50px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #999; }
 
         .admin-box { border: 2px dashed #cbd5e0; background-color: #f8fafc; }
         .admin-title { color: #64748b; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; margin-bottom: 15px; }
-        
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -39,17 +38,7 @@
 
 <div class="container">
     <h1>🏫 Daily Attendance Check-in</h1>
-    
-    <select id="activeSubject" style="border: 2px solid #4CAF50; font-weight: bold;">
-        <option value="General">General Attendance</option>
-        <option value="Mathematics">Mathematics</option>
-        <option value="Science">Science</option>
-        <option value="English">English</option>
-        <option value="History">History</option>
-        <option value="Physical Education">P.E.</option>
-    </select>
-
-    <input type="text" id="attendanceInput" placeholder="Scan RFID tag here..." autofocus autocomplete="off">
+    <input type="text" id="attendanceInput" placeholder="Scan RFID tag here..." autofocus>
     <div id="status"></div>
 
     <h3>🕒 Today's Live Log</h3>
@@ -59,7 +48,8 @@
                 <th>Photo</th>
                 <th>Time</th>
                 <th>Name</th>
-                <th>Subject</th> <th>Grade</th>
+                <th>Grade</th>
+                <th>Gender</th>
                 <th>ID</th>
             </tr>
         </thead>
@@ -70,182 +60,125 @@
 <div class="container admin-box">
     <div class="admin-title">Teacher Control Panel</div>
     <h2>➕ Register New Student</h2>
-    
+
     <div class="form-grid">
         <input type="text" id="regName" placeholder="Full Name">
         <select id="regGrade">
             <option value="" disabled selected>Select Grade</option>
-            <option value="Grade 1">Grade 1</option><option value="Grade 2">Grade 2</option>
-            <option value="Grade 3">Grade 3</option><option value="Grade 4">Grade 4</option>
-            <option value="Grade 5">Grade 5</option><option value="Grade 6">Grade 6</option>
-            <option value="Grade 7">Grade 7</option><option value="Grade 8">Grade 8</option>
-            <option value="Grade 9">Grade 9</option><option value="Grade 10">Grade 10</option>
-            <option value="Grade 11">Grade 11</option><option value="Grade 12">Grade 12</option>
-            <option value="Teacher">Teacher</option>
+            <option>Grade 1</option><option>Grade 2</option><option>Grade 3</option>
+            <option>Grade 4</option><option>Grade 5</option><option>Grade 6</option>
+            <option>Grade 7</option><option>Grade 8</option><option>Grade 9</option>
+            <option>Grade 10</option><option>Grade 11</option><option>Grade 12</option>
+            <option>Teacher</option>
         </select>
+
+        <!-- ✅ GENDER ADDED -->
         <select id="regGender">
             <option value="" disabled selected>Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
         </select>
     </div>
-    
-    <input type="text" id="regSubject" placeholder="Major Subject / Department (e.g. Science)">
-    
-    <input type="file" id="regPhoto" accept="image/*">
-    <input type="text" id="regTag" placeholder="Scan Card to Register ID...">
-    <button onclick="registerStudent()">Save Student Profile</button>
 
-    <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ddd;">
-    
-    <h2>👥 Student Management</h2>
-    <table id="managementTable">
-        <thead>
-            <tr>
-                <th>Photo</th>
-                <th>Name</th>
-                <th>Grade</th>
-                <th>Major</th> <th>Tag ID</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <input type="file" id="regPhoto" accept="image/*">
+    <input type="text" id="regTag" placeholder="Scan card to register">
+    <button onclick="registerStudent()">Save Student Profile</button>
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, setDoc, deleteDoc, doc, onSnapshot, query, orderBy, limit, serverTimestamp } 
-    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, setDoc, doc, onSnapshot, query, orderBy, limit, serverTimestamp } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyA4wkoriBIuM2BSk6MhebiBEeGgihP88A4",
   authDomain: "rfid-project-d8ede.firebaseapp.com",
   projectId: "rfid-project-d8ede",
   storageBucket: "rfid-project-d8ede.firebasestorage.app",
   messagingSenderId: "710271372713",
-  appId: "1:710271372713:web:f9d549fda2106ffe0d08b8",
-  measurementId: "G-JLMGYZNRRY"
+  appId: "1:710271372713:web:f9d549fda2106ffe0d08b8"
 };
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
 
-  const toBase64 = file => new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
-  });
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  let studentDirectory = {}; 
+const toBase64 = file => new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+});
 
-  // Sync Student Directory & Management Table
-  onSnapshot(collection(db, "students"), (snapshot) => {
-      const mgmtBody = document.querySelector('#managementTable tbody');
-      mgmtBody.innerHTML = '';
-      studentDirectory = {};
+let studentDirectory = {};
 
-      snapshot.forEach((doc) => {
-          const d = doc.data();
-          const id = doc.id;
-          studentDirectory[id] = { name: d.name, grade: d.grade, gender: d.gender, photo: d.photo, subject: d.subject };
+onSnapshot(collection(db, "students"), snap => {
+    snap.forEach(d => {
+        studentDirectory[d.id] = d.data();
+    });
+});
 
-          const row = `<tr>
-              <td>${d.photo ? `<img src="${d.photo}" class="profile-pic">` : `<div class="no-pic">?</div>`}</td>
-              <td>${d.name}</td>
-              <td>${d.grade}</td>
-              <td>${d.subject || '--'}</td>
-              <td>${id}</td>
-              <td><button class="btn-delete" onclick="deleteStudent('${id}')">Delete</button></td>
-          </tr>`;
-          mgmtBody.innerHTML += row;
-      });
-  });
+window.registerStudent = async function() {
+    const name = regName.value.trim();
+    const grade = regGrade.value;
+    const gender = regGender.value;
+    const tag = regTag.value.trim();
+    const photoFile = regPhoto.files[0];
 
-  window.registerStudent = async function() {
-      const name = document.getElementById('regName').value.trim();
-      const grade = document.getElementById('regGrade').value;
-      const gender = document.getElementById('regGender').value;
-      const subject = document.getElementById('regSubject').value.trim(); // Get subject
-      const tagId = document.getElementById('regTag').value.trim();
-      const photoFile = document.getElementById('regPhoto').files[0];
+    if (!name || !grade || !gender || !tag) {
+        alert("Fill all fields!");
+        return;
+    }
 
-      if (!name || !tagId || !grade) return alert("Fill Name, Grade, and Tag ID!");
+    let photo = null;
+    if (photoFile) photo = await toBase64(photoFile);
 
-      let photoBase64 = null;
-      if (photoFile) photoBase64 = await toBase64(photoFile);
+    await setDoc(doc(db, "students", tag), {
+        name, grade, gender, photo,
+        registeredAt: serverTimestamp()
+    });
 
-      try {
-          await setDoc(doc(db, "students", tagId), { 
-              name, 
-              grade, 
-              gender, 
-              subject: subject || "N/A", // Save subject
-              photo: photoBase64, 
-              registeredAt: serverTimestamp() 
-          });
-          alert("Student Saved!");
-          ['regName','regTag','regPhoto','regSubject'].forEach(id => document.getElementById(id).value = '');
-          ['regGrade','regGender'].forEach(id => document.getElementById(id).value = '');
-      } catch (e) { alert("Error!"); }
-  }
+    alert("Student registered!");
+    regName.value = regGrade.value = regGender.value = regTag.value = '';
+    regPhoto.value = '';
+};
 
-  window.deleteStudent = async function(id) {
-      if (confirm(`Are you sure you want to delete this student?`)) {
-          try {
-              await deleteDoc(doc(db, "students", id));
-              alert("Deleted successfully.");
-          } catch (e) { alert("Delete failed."); }
-      }
-  }
+attendanceInput.addEventListener("keypress", async e => {
+    if (e.key === "Enter") {
+        const id = attendanceInput.value.trim();
+        attendanceInput.value = '';
+        if (!id) return;
 
-  const attendanceInput = document.getElementById('attendanceInput');
-  attendanceInput.addEventListener('keypress', async (e) => {
-      if (e.key === 'Enter' && attendanceInput.value.trim()) {
-          const id = attendanceInput.value.trim();
-          const activeSub = document.getElementById('activeSubject').value; // Get current class subject
-          const student = studentDirectory[id];
-          
-          try {
-              await addDoc(collection(db, "attendance"), {
-                  tag_id: id,
-                  student_name: student ? student.name : "Unknown",
-                  student_grade: student ? student.grade : "--",
-                  student_photo: student ? student.photo : null,
-                  subject: activeSub, // Log the subject of the session
-                  timestamp: serverTimestamp()
-              });
-              showStatus(student ? `✅ ${student.name} checked into ${activeSub}!` : `⚠️ Unknown Tag`, student ? "success" : "error");
-          } catch (e) { showStatus("❌ Error", "error"); }
-          attendanceInput.value = '';
-      }
-  });
+        const s = studentDirectory[id];
+        await addDoc(collection(db, "attendance"), {
+            tag_id: id,
+            student_name: s?.name || "Unknown",
+            student_grade: s?.grade || "--",
+            student_gender: s?.gender || "--",
+            student_photo: s?.photo || null,
+            timestamp: serverTimestamp()
+        });
+    }
+});
 
-  function showStatus(msg, type) {
-      const div = document.getElementById('status');
-      div.textContent = msg; div.className = type; div.style.display = 'block';
-      setTimeout(() => div.style.display = 'none', 3000);
-  }
-
-  onSnapshot(query(collection(db, "attendance"), orderBy("timestamp", "desc"), limit(10)), (snapshot) => {
-      const tbody = document.querySelector('#attendanceTable tbody');
-      tbody.innerHTML = ''; 
-      snapshot.forEach((doc) => {
-          const d = doc.data();
-          const time = d.timestamp ? d.timestamp.toDate().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : "---";
-          tbody.innerHTML += `<tr>
-              <td>${d.student_photo ? `<img src="${d.student_photo}" class="profile-pic">` : `<div class="no-pic">?</div>`}</td>
-              <td>${time}</td>
-              <td>${d.student_name}</td>
-              <td><strong>${d.subject || 'General'}</strong></td>
-              <td>${d.student_grade}</td>
-              <td>${d.tag_id}</td>
-          </tr>`;
-      });
-  });
+const q = query(collection(db, "attendance"), orderBy("timestamp", "desc"), limit(10));
+onSnapshot(q, snap => {
+    const tbody = document.querySelector("tbody");
+    tbody.innerHTML = "";
+    snap.forEach(d => {
+        const x = d.data();
+        tbody.innerHTML += `
+        <tr>
+            <td>${x.student_photo ? `<img src="${x.student_photo}" class="profile-pic">` : `<div class="no-pic">?</div>`}</td>
+            <td>${x.timestamp?.toDate().toLocaleTimeString()}</td>
+            <td>${x.student_name}</td>
+            <td>${x.student_grade}</td>
+            <td>${x.student_gender}</td>
+            <td>${x.tag_id}</td>
+        </tr>`;
+    });
+});
 </script>
+
 </body>
 </html>
-
